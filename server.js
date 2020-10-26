@@ -1,8 +1,12 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
 const cTable = require('console.table');
+const express = require("express");
 
-var connection = mysql.createConnection({
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+const connection = mysql.createConnection({
     host: "localhost",
 
     // Your port; if not 3306
@@ -33,8 +37,14 @@ function startTracker() {
             }
             else if (answer.task === "View all employees") {
                 // display list in console
-                // console.table(employee);
+                connection.query("SELECT * FROM employee", function(err, data){
+                    if(err)throw err;
+                    console.table(data);
+                })
+                startTracker();
+            
             }
+            
             else if (answer.task === "Update employee") {
                 // make a function to update table
             }
@@ -44,6 +54,11 @@ function startTracker() {
             }
             else if (answer.task === "View employee roles") {
                 // make a function to list employees by role
+                connection.query("SELECT * FROM employee", function(err, res){
+                    if(err)throw err;
+                    console.table(res.employee.role_id);
+                })
+                startTracker();
             }
             else if (answer.task === "Add department") {
                 // make a function to add department"
@@ -53,7 +68,7 @@ function startTracker() {
             }
             else if (answer.task === "Update employee roles") {
                 // make a function to add role to employee"
-                function addRole();
+                // function addRole();
             }
             else {
                 connection.end();
@@ -106,30 +121,32 @@ function startTracker() {
     }
 }
 
-function updateEmployee() { }
-function addRole() {
-    inquirer
-        .prompt([
-            {
-                name: "role",
-                message: "What is the employee's role?",
-                type: "list",
-                choices: ["Software Engineer", "Salesperson", "Lead Engineer", "Sales lead", "Accountant"]
+// function updateEmployee() { }
+// function addRole() {
+    // inquirer
+    //     .prompt([
+    //         {
+    //             name: "role",
+    //             message: "What is the employee's role?",
+    //             type: "list",
+    //             choices: ["Software Engineer", "Salesperson", "Lead Engineer", "Sales lead", "Accountant"]
 
-            }
-        ]).then(function (answer) {
-            connection.query(
-                "UPDATE employee SET role_id",
-                [{
-                    role_id: answer.role
-                }],
-                function (error) {
-                    if (error) throw err;
-                    startTracker();
-                }
-            )
+    //         }
+    //     ]).then(function (answer) {
+    //         connection.query(
+    //             "UPDATE employee SET role_id",
+    //             [{
+    //                 role_id: answer.role
+    //             }],
+    //             function (error) {
+    //                 if (error) throw err;
+    //                 startTracker();
+    //             }
+    //         )
 
-        })
-
-
+    //     })
+    // }
+app.listen(PORT, function() {
+    console.log("App listening on PORT " + PORT);
+  });
 
