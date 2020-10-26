@@ -33,7 +33,7 @@ function startTracker() {
             }
             else if (answer.task === "View all employees") {
                 // display list in console
-                console.table("employees list");
+                // console.table(employee);
             }
             else if (answer.task === "Update employee") {
                 // make a function to update table
@@ -51,10 +51,11 @@ function startTracker() {
             else if (answer.task === "Add role to employee") {
                 // make a function to add role to employee"
             }
-            else if (answer.task ==="Update employee roles") {
+            else if (answer.task === "Update employee roles") {
                 // make a function to add role to employee"
+                function addRole();
             }
-          else {
+            else {
                 connection.end();
             }
 
@@ -87,7 +88,7 @@ function startTracker() {
             ]).then(function (answer) {
                 // when finished prompting, insert a new item into the db with that info
                 connection.query(
-                    "INSERT INTO employee SET ?",
+                    "INSERT INTO employee",
                     {
                         first_name: answer.firstName,
                         last_name: answer.lastName,
@@ -102,9 +103,33 @@ function startTracker() {
                     }
                 );
             });
-        }
+    }
 }
 
-function updateEmployee(){}
-function addRole(){}
+function updateEmployee() { }
+function addRole() {
+    inquirer
+        .prompt([
+            {
+                name: "role",
+                message: "What is the employee's role?",
+                type: "list",
+                choices: ["Software Engineer", "Salesperson", "Lead Engineer", "Sales lead", "Accountant"]
+
+            }
+        ]).then(function (answer) {
+            connection.query(
+                "UPDATE employee SET role_id",
+                [{
+                    role_id: answer.role
+                }],
+                function (error) {
+                    if (error) throw err;
+                    startTracker();
+                }
+            )
+
+        })
+
+
 
