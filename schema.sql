@@ -12,13 +12,11 @@ department_id  int null,
 PRIMARY KEY(id)
   );
 
-select * from employee_trackerDB;
-
 CREATE TABLE employee(
-id INT not null,
+id INT not null AUTO_INCREMENT,
 first_name VARCHAR(30) not null,
 last_name VARCHAR(30) not null,
-role_id  int noy null,
+role_id  int not null,
 manager_id INT null
 PRIMARY KEY(id)
   );
@@ -28,3 +26,4 @@ id INT not null,
 name VARCHAR(30) not null,
 PRIMARY KEY(id)
   );
+  select * from employee_trackerDB;
