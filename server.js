@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const cTable = require('console.table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -16,7 +17,7 @@ var connection = mysql.createConnection({
 });
 startTracker();
 
-function startTracker(task) {
+function startTracker() {
     inquirer
         .prompt({
             name: "task",
@@ -24,33 +25,33 @@ function startTracker(task) {
             message: "Would you like to do?",
             choices: ["View all employees", "View all employees by department", "View employee roles", "Update employee roles", "Add employee", "Add department", "Add role to employee", "Exit"]
         })
-        .then(function (task) {
+        .then(function (answer) {
             // based on their answer, either call the bid or the post functions
-            if (task.choices === "Add employee") {
+            if (answer.task === "Add employee") {
                 // prompt questions to create employee
                 createEmployee();
             }
-            else if (task.choices === "View all employees") {
+            else if (answer.task === "View all employees") {
                 // display list in console
                 console.table("employees list");
             }
-            else if (task.choices === "Update employee") {
+            else if (answer.task === "Update employee") {
                 // make a function to update table
             }
 
-            else if (task.choices === "View all employees by department") {
+            else if (answer.task === "View all employees by department") {
                 // make a function to list employees by department
             }
-            else if (task.choices === "View employee roles") {
+            else if (answer.task === "View employee roles") {
                 // make a function to list employees by role
             }
-            else if (task.choices === "Add department") {
+            else if (answer.task === "Add department") {
                 // make a function to add department"
             }
-            else if (task.choices === "Add role to employee") {
+            else if (answer.task === "Add role to employee") {
                 // make a function to add role to employee"
             }
-            else if (task.choices ==="Update employee roles") {
+            else if (answer.task ==="Update employee roles") {
                 // make a function to add role to employee"
             }
           else {
