@@ -51,7 +51,13 @@ function startTracker() {
             }
 
             else if (answer.task === "View all employees by department") {
+            
+            connection.query("SELECT * FROM department", function (err, departmentData) {
+                if (err) throw err;
                 // make a function to list employees by department
+                console.table(departmentData);
+            })
+            startTracker();
             }
             else if (answer.task === "View employee roles") {
                 // make a function to list employees by role
@@ -63,6 +69,11 @@ function startTracker() {
             }
             else if (answer.task === "Add department") {
                 // make a function to add department"
+                connection.connect(function (roleErr) {
+                    if (roleErr) throw roleErr;
+                    addDepartment();
+                });
+                startTracker();
             }
             else if (answer.task === "Add role") {
                 // make a function to add role to employee"
@@ -175,7 +186,7 @@ function addRole() {
             }
         ]).then(function (answer) {
             connection.query(
-                "INSERT INTO role(title, id)VALUES(?,?)",
+                "INSERT INTO role(title)VALUES(?)",
                 [
                    answer.role
                 ],
@@ -187,6 +198,32 @@ function addRole() {
 
         })
 }
+ function addDepartment(){
+    inquirer
+    .prompt([
+        {
+            name: "department",
+            message: "What is the new department?",
+            type: "list",
+            choices: ["Accounting", "Engineering", "Consultanting", "Sales"]
+
+        }
+    ]).then(function (answer) {
+        console.log(answer)
+;        connection.query(
+            "INSERT INTO department(name)VALUES(?)",
+            [
+               answer.department
+            ],
+            function (error) {
+                if (error) throw error;
+                startTracker();
+            }
+        )
+
+    })
+
+ }
 app.listen(PORT, function () {
     console.log("App listening on PORT " + PORT);
 });
