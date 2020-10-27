@@ -66,17 +66,17 @@ function startTracker() {
             }
             else if (answer.task === "Add role") {
                 // make a function to add role to employee"
+                connection.connect(function (roleErr) {
+                    if (roleErr) throw roleErr;
+                    addRole();
+                });
+                startTracker();
 
 
             }
             else if (answer.task === "Update employee roles") {
                 // make a function to add role to employee"
-                connection.connect(function (err) {
-                    if (err) throw err;
-                    addRole();
-                });
-                startTracker();
-
+                
             }
             else {
                 connection.end();
@@ -168,19 +168,19 @@ function addRole() {
         .prompt([
             {
                 name: "role",
-                message: "What is the employee's role?",
+                message: "What is the new role?",
                 type: "list",
-                choices: ["Software Engineer", "Salesperson", "Lead Engineer", "Sales lead", "Accountant"]
+                choices: ["Marketing", "Marketing Manager", "Consultant"]
 
             }
         ]).then(function (answer) {
             connection.query(
-                "UPDATE role SET role.title",
-                [{
-                    title: answer.role
-                }],
+                "INSERT INTO role(title, id)VALUES(?,?)",
+                [
+                   answer.role
+                ],
                 function (error) {
-                    if (error) throw err;
+                    if (error) throw error;
                     startTracker();
                 }
             )
