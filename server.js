@@ -20,6 +20,7 @@ const connection = mysql.createConnection({
     password: "RootPassword",
     database: "employee_trackerDB"
 });
+
 startTracker();
 
 function startTracker() {
@@ -28,7 +29,7 @@ function startTracker() {
             name: "task",
             type: "list",
             message: "Would you like to do?",
-            choices: ["View all employees", "View all employees by department", "View employee roles", "Update employee roles", "Add employee", "Add department", "Add role", "Exit"]
+            choices: ["View all employees", "View all departments", "View employee roles", "Update employee roles", "Add employee", "Add department", "Add role", "Exit"]
         })
         .then(function (answer) {
             // based on their answer, either call the bid or the post functions
@@ -50,20 +51,20 @@ function startTracker() {
                 // make a function to update table
             }
 
-            else if (answer.task === "View all employees by department") {
-            
-            connection.query("SELECT * FROM department", function (err, departmentData) {
-                if (err) throw err;
-                // make a function to list employees by department
-                console.table(departmentData);
-            })
-            startTracker();
+            else if (answer.task === "View all departments") {
+
+                connection.query("SELECT * FROM department", function (err, departmentData) {
+                    if (err) throw err;
+                    // make a function to list employees by department
+                    console.table(departmentData);
+                })
+                startTracker();
             }
             else if (answer.task === "View employee roles") {
                 // make a function to list employees by role
-                connection.query("SELECT * FROM employee", function (err, res) {
+                connection.query("SELECT * FROM role", function (err, res) {
                     if (err) throw err;
-                    console.table(res.employee.role_id);
+                    console.table(res);
                 })
                 startTracker();
             }
@@ -86,8 +87,15 @@ function startTracker() {
 
             }
             else if (answer.task === "Update employee roles") {
+               
                 // make a function to add role to employee"
-                
+                connection.connect(function (roleErr) {
+                    if (roleErr) throw roleErr;
+                    updateEmployeeRole();
+                });
+                startTracker();
+
+
             }
             else {
                 connection.end();
@@ -100,30 +108,32 @@ function createEmployee() {
     connection.query(
         "SELECT * FROM employee_trackerDB.employee where manager_id=0;",
         function (err, data) {
-            console.log(data);
+
             const managerArray = data.map(manager => {
                 return {
                     name: manager.first_name + " " + manager.last_name,
                     value: manager.manager_id
                 }
+
             });
-            console.log(managerArray);
+
+
             connection.query(
 
                 "SELECT * from role", function (roleErr, res) {
-                    console.log(res);
+
                     const roleArray = res.map(role => {
                         return {
                             name: role.title,
                             value: role.id
                         }
                     });
-                    console.log(roleArray);
+
 
 
                     inquirer
                         .prompt([
-                           
+
                             {
                                 name: "firstName",
                                 type: "input",
@@ -148,7 +158,7 @@ function createEmployee() {
 
                         ]).then(function (answer) {
                             // when finished prompting, insert a new item into the db with that info
-                            console.log(answer);
+
                             connection.query(
                                 "INSERT INTO employee (first_name, last_name, role_id, manager_id ) VALUES(?,?,?,?)",
                                 [
@@ -173,7 +183,57 @@ function createEmployee() {
 }
 
 
-// function updateEmployee() { }
+function updateEmployeeRole() {
+    connection.query(
+
+        "SELECT * from role", function (roleErr, res) {
+
+            const newRoleArray = res.map(role => {
+                return {
+                    
+                    value: role.id
+                }
+            }
+        );
+    inquirer
+        .prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?"
+            }, {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?"
+            },
+
+            {
+                name: "role",
+                message: "What is the new Employee role?",
+                type: "list",
+                choices: newRoleArray
+
+            }
+        ]).then(function (answer) {
+            connection.query(
+                "Update employee Where first_name = '"+ answer.firstName + "' AND last_name = '" + answer.lastName +"'",
+                [
+                    {
+                        role_id:answer.role
+                    }
+                    
+                ],
+                function (error) {
+                    if (error) throw error;
+                    startTracker();
+                }
+            )
+
+        })
+    
+}
+    )}
+
 function addRole() {
     inquirer
         .prompt([
@@ -181,14 +241,14 @@ function addRole() {
                 name: "role",
                 message: "What is the new role?",
                 type: "list",
-                choices: ["Marketing", "Marketing Manager", "Consultant"]
+                choices: ["Marketing", "HR Manager", "Consultant", "Customer service representative"]
 
             }
         ]).then(function (answer) {
             connection.query(
                 "INSERT INTO role(title)VALUES(?)",
                 [
-                   answer.role
+                    answer.role
                 ],
                 function (error) {
                     if (error) throw error;
@@ -198,32 +258,32 @@ function addRole() {
 
         })
 }
- function addDepartment(){
+function addDepartment() {
     inquirer
-    .prompt([
-        {
-            name: "department",
-            message: "What is the new department?",
-            type: "list",
-            choices: ["Accounting", "Engineering", "Consultanting", "Sales"]
+        .prompt([
+            {
+                name: "department",
+                message: "What is the new department?",
+                type: "list",
+                choices: ["Legal", "HR", "Consultanting", "Customer Service"]
 
-        }
-    ]).then(function (answer) {
-        console.log(answer)
-;        connection.query(
-            "INSERT INTO department(name)VALUES(?)",
-            [
-               answer.department
-            ],
-            function (error) {
-                if (error) throw error;
-                startTracker();
             }
-        )
+        ]).then(function (answer) {
 
-    })
+            ; connection.query(
+                "INSERT INTO department(name)VALUES(?)",
+                [
+                    answer.department
+                ],
+                function (error) {
+                    if (error) throw error;
+                    startTracker();
+                }
+            )
 
- }
+        })
+
+}
 app.listen(PORT, function () {
     console.log("App listening on PORT " + PORT);
 });
